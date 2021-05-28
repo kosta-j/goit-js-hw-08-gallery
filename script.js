@@ -15,15 +15,17 @@
 import images from './gallery-items.js';
 
 // elements parsing
-const galleryRef = document.querySelector('.gallery');
+const galleryRef = document.querySelector('.js-gallery');
+const galleryModalWindowRef = document.querySelector('.js-lightbox');
+const galleryModalWindowImageRef = document.querySelector('.lightbox__image');
 
 // markup creating
 const makeGalleryMarkup = ({ preview, original, description }) => {
+  // href="${original}"
   return `
 <li class="gallery__item">
   <a
     class="gallery__link"
-    href="${original}"
   >
     <img
       class="gallery__image"
@@ -38,3 +40,18 @@ const makeGalleryMarkup = ({ preview, original, description }) => {
 // markup rendering
 const makeGallery = images.map(makeGalleryMarkup).join('');
 galleryRef.insertAdjacentHTML('beforeend', makeGallery);
+
+// listener adding
+galleryRef.addEventListener('click', onGalleryImageClick);
+
+function onGalleryImageClick(event) {
+  const originalImageUrl = event.target.dataset.source;
+  const imageDescription = event.target.getAttribute('alt');
+
+  galleryModalWindowImageRef.setAttribute('src', originalImageUrl);
+  galleryModalWindowImageRef.setAttribute('alt', imageDescription);
+
+  galleryModalWindowRef.classList.add('is-open');
+
+  // console.log(event.target.attributes);
+}
