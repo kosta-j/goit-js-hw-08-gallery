@@ -11,6 +11,7 @@
 // Очистка значения атрибута src элемента img.lightbox__image.+
 // Это необходимо для того, чтобы при следующем открытии модального окна,
 // пока грузится изображение, мы не видели предыдущее.
+
 'use strict';
 import images from './gallery-items.js';
 
@@ -25,13 +26,13 @@ const modalWindowCloseBtnRef = document.querySelector(
 );
 const modalOverlayRef = document.querySelector('.lightbox__overlay');
 
-// markup creating
+// markup creating:
 const makeGalleryMarkup = ({ preview, original, description }) => {
-  // href="${original}"
   return `
   <li class="gallery__item">
   <a
-      class="gallery__link"
+  class="gallery__link"
+  href="${original}"
   >
     <img
       class="gallery__image"
@@ -43,45 +44,45 @@ const makeGalleryMarkup = ({ preview, original, description }) => {
 </li>`;
 };
 
-// markup rendering
 const makeGallery = images.map(makeGalleryMarkup).join('');
+
+// markup rendering:
 galleryRef.insertAdjacentHTML('beforeend', makeGallery);
 
-// array of image original URLs
+// array of image original URLs (for arrow key events):
 const arrayImages = images.map(image => image.original);
 
-// listeners adding
+// listeners:
 galleryRef.addEventListener('click', onGalleryImageClick);
-modalWindowCloseBtnRef.addEventListener('click', onModalWindowCloseBtnClick);
-modalOverlayRef.addEventListener('click', onModalWindowCloseBtnClick);
-document.addEventListener('keydown', onKeydown);
+modalWindowCloseBtnRef.addEventListener('click', closeModal);
+modalOverlayRef.addEventListener('click', closeModal);
 
 // callback functions:
 
 function onGalleryImageClick(event) {
-  const originalImageUrl = event.target.dataset.source;
-  const imageDescription = event.target.alt;
+  event.preventDefault();
 
-  galleryModalWindowImageRef.src = originalImageUrl;
-  galleryModalWindowImageRef.alt = imageDescription;
+  setModalImage(event);
 
   galleryModalWindowRef.classList.add('is-open');
+
+  document.addEventListener('keydown', onKeydown);
 }
 
-// common function for all modal close events
-function onModalWindowCloseBtnClick() {
+function setModalImage(event) {
+  galleryModalWindowImageRef.src = event.target.dataset.source;
+  galleryModalWindowImageRef.alt = event.target.alt;
+}
+
+function closeModal() {
   galleryModalWindowRef.classList.remove('is-open');
   galleryModalWindowImageRef.src = '';
 }
 
 function onKeydown(event) {
-  if (!galleryModalWindowRef.className.includes('is-open')) {
-    return;
-  }
-
   // Escape key
   if (event.key === 'Escape') {
-    onModalWindowCloseBtnClick();
+    closeModal();
     return;
   }
 
